@@ -68,7 +68,7 @@ namespace GrailsortTester
     //
     // Editor: AceOfSpadesProduc100, from DeveloperSort's Java version
     //
-    // Current status: Changed from object to angle bracket generics in 4/28/2022. Only ints tested.
+    // Current status: Only ints tested.
 
     //Credit to phoenixbound for this clever idea
     enum Subarray
@@ -77,19 +77,14 @@ namespace GrailsortTester
         RIGHT
     }
 #nullable enable
-    public class GrailSort<K>
+    public class GrailSort<K>(IComparer<K> cmp)
     {
         private int currBlockLen;
         private Subarray currBlockOrigin;
 
 
 
-        public readonly IComparer<K> cmp;
-
-        public GrailSort(IComparer<K> cmp)
-        {
-            this.cmp = cmp;
-        }
+        public readonly IComparer<K> cmp = cmp;
 
         private static void GrailSwap(K[] array, int a, int b)
         {
