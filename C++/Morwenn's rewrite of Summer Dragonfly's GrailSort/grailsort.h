@@ -133,7 +133,7 @@ namespace grailsort_detail
         }
 
         template<typename RandomAccessIterator, typename Compare, typename T>
-        static int BinarySearchLeft(RandomAccessIterator array, int start, int length, const T& target, Compare comp) {
+        static int BinarySearchLeft(RandomAccessIterator array, int start, int length, T&& target, Compare comp) {
             int left  = 0;
             int right = length;
 
@@ -153,7 +153,7 @@ namespace grailsort_detail
 
         // Credit to Anonymous0726 for debugging
         template<typename RandomAccessIterator, typename Compare, typename T>
-        static int BinarySearchRight(RandomAccessIterator array, int start, int length, const T& target, Compare comp) {
+        static int BinarySearchRight(RandomAccessIterator array, int start, int length, T&& target, Compare comp) {
             int left  = 0;
             int right = length;
 
@@ -283,7 +283,10 @@ namespace grailsort_detail
             }
 
             if(buffer != left) {
-                std::swap_ranges(buffer, buffer + (middle - left), left);
+                while (left != middle) {
+                    std::iter_swap(buffer, left);
+                    ++buffer; ++left;
+                }
             }
         }
 
@@ -985,7 +988,7 @@ namespace grailsort_detail
 
         template<typename RandomAccessIterator, typename BufferIterator, typename Compare>
         void CombineOutOfPlace(RandomAccessIterator array, int firstKey, int start, int length, int subarrayLen, int blockLen,
-                               int mergeCount, int lastSubarrays, BufferIterator extBuffer, int extBufferLen, Compare comp) {
+                               int mergeCount, int lastSubarrays, BufferIterator extBuffer, Compare comp) {
             std::move(array + (start - blockLen), array + start, extBuffer);
 
             int fullMerge = 2 * subarrayLen;
@@ -1070,7 +1073,7 @@ namespace grailsort_detail
             //                                   block fits into our external buffer.
             if(buffer && blockLen <= extBufferLen) {
                 CombineOutOfPlace(array, firstKey, start, length, subarrayLen, blockLen, mergeCount, lastSubarrays,
-                                  extBuffer, extBufferLen, comp);
+                                  extBuffer, comp);
             }
             else {
                 CombineInPlace(array, firstKey, start, length, subarrayLen, blockLen,
@@ -1186,8 +1189,8 @@ namespace grailsort_detail
                 return;
             }
 
-            BufferIterator extBuffer;
-            int extBufferLen;
+            BufferIterator extBuffer{};
+            int extBufferLen = 0;
 
             int blockLen = 1;
 
